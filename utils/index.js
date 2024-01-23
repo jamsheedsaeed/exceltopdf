@@ -12,14 +12,24 @@ export default function generatePDF(excelData) {
   const thirdtblFirstColVal = thirdTableValues["#VALUE!"];
   const thirdtblSecColVal = thirdTableValues["__EMPTY_3"];
   const data2 = excelData.slice(7, 19);
-  const headers = data2[0];
+  const lastTableData = excelData.slice(21, 31);
+  const lastTableDataHeader = excelData[20];
+  const signaturesName = excelData[31]["__EMPTY_26"];
+  const columnIndexToChangeColor = 34; // Change this index as needed
+  const rowIndexToChangeColor = 10; // Change this index as needed
+  const columnIndexToChangeFontColor = 1; // Index of the first column
+  const columnIndexToChangeFontColorLastTable = 1;
 
-  const numericHeaders = Object.keys(headers)
-    .filter((key) => {
-      const numericValue = parseInt(headers[key]);
-      return !isNaN(numericValue) && numericValue <= 34;
-    })
-    .map((key) => headers[key]);
+  const tableBody = lastTableData?.map((data) => [
+    { text: data["#VALUE!"], style: "tableCell" },
+    { text: data["__EMPTY_1"], style: "redText" },
+    { text: data["__EMPTY_2"], style: "tableCell" },
+    { text: data["__EMPTY_3"], style: "tableCell" },
+  ]);
+
+  const allHeaders = Object.keys(data2[0]).filter(
+    (header) => header !== "__EMPTY"
+  );
 
   var docDefinition = {
     pageOrientation: "landscape",
@@ -43,46 +53,71 @@ export default function generatePDF(excelData) {
       { text: "\n", fontSize: 10 },
       {
         table: {
+            headerRows: 1,
+            widths: [
+                20,
+                130, // Increased width for the second column
+                ...Array.from({ length: allHeaders.length - 2 }, () => "auto"),
+              ],            heights: 8,
+            layout: {
+                hLineWidth: (i) => (i === 0 ? 2 : 1),
+                vLineWidth: () => 1,
+                hLineColor: (i) => (i === 0 ? "#000" : "#aaa"),
+                paddingTop: (i) => (i === 0 ? 2 : 1),
+                paddingBottom: (i) => (i === table.body.length - 1 ? 2 : 1),
+                cellPadding: { top: 2, bottom: 2, left: 2, right: 2 }, // Adjust padding
+                fontSize: 8, // Adjust font size
+                lineHeight: 1, // Adjust line height
+            },
+            body: [
+              [
+                ...allHeaders.map((header) => ({
+                  text: data2[0][header],
+                  style: "tableCellBold",
+                })),
+              ],
+              ...data2.slice(1).map((row, rowIdx) => allHeaders.map((header, colIdx) => ({
+                text: row[header],
+                style: colIdx === columnIndexToChangeFontColor ? "redText" : "tableCell", // Apply specific style for the first column
+                fillColor: (rowIdx === rowIndexToChangeColor || colIdx === columnIndexToChangeColor) ? "#d0cece" : undefined, // Set the background color for the specific row and column
+              }))),
+            ],
+          },
+        },
+      {
+        table: {
           headerRows: 1,
-          widths: [
-            "auto",
-            130,
-            80,
-            ...Array.from({ length: numericHeaders.length }, () => "auto"),
-          ],
-          heights: 10,
+          widths: [200, "*"],
           body: [
             [
-              { text: "Redni broj", style: "tableCellBold" },
-              {
-                text: "Ime i prezime krajnjeg korisnika",
-                style: "tableCellBold",
-              },
-              { text: "OIB krajnjeg korisnika", style: "tableCellBold" },
-              ...numericHeaders.map((header) => ({
-                text: header,
-                style: "tableCellBold",
-              })),
+              { text: thirdtblFirstColVal, style: "tableCellmiddle" },
+              { text: thirdtblSecColVal, style: "tableCellmiddle" },
             ],
-            ...data2.slice(1).map((row) => [
-              { text: row["#VALUE!"], style: "tableCell" },
-              { text: row["__EMPTY_1"], style: "tableCell" },
-              { text: row["__EMPTY_2"], style: "tableCell" },
-              ...numericHeaders.map((header) => ({
-                text: row[header],
-                style: "tableCell",
-              })),
-            ]),
           ],
         },
       },
       {
         table: {
           headerRows: 1,
-          widths: ["auto", "*"],
+          widths: ["auto", 130, 80, 500],
+          heights: 10,
           body: [
-            [{ text: thirdtblFirstColVal, style: "tableCell" },
-            { text: thirdtblSecColVal, style: "tableCell" },]
+            [
+              { text: lastTableDataHeader["#VALUE!"], style: "tableCellBold" },
+              {
+                text: lastTableDataHeader["__EMPTY_1"],
+                style: "tableCellBold",
+              },
+              {
+                text: lastTableDataHeader["__EMPTY_2"],
+                style: "tableCellBold",
+              },
+              {
+                text: lastTableDataHeader["__EMPTY_3"],
+                style: "tableCellBold",
+              },
+            ],
+            ...tableBody,
           ],
         },
       },
@@ -92,13 +127,63 @@ export default function generatePDF(excelData) {
         fontSize: 8,
         margin: [0, 3, 0, 3],
       },
+      tableCellmiddle: {
+        fontSize: 8,
+        margin: [0, 3, 0, 3],
+        fillColor: "#fce4d6", // Set the cell color
+      },
+      tableHeader: {
+        fontSize: 12,
+        bold: true,
+        color: "black", // Text color
+      },
       tableCellBold: {
+        fillColor: "#b4c6e7", // Set the header color
         fontSize: 8,
         margin: [0, 3, 0, 3],
         bold: true,
       },
+      tableCellBoldlast: {
+        fillColor: "#b4c6e7", // Set the header color
+        fontSize: 8,
+        margin: [0, 3, 0, 3],
+        bold: true,
+      },
+      redText: {
+        color: "red", // Set the text color for the first column data
+        fontSize: 8,
+        bold: true,
+        margin: [0, 3, 0, 3],
+      },
     },
   };
+
+  const signatureContent = [
+    {
+      canvas: [
+        {
+          type: "rect",
+          x: 620,
+          y: 50,
+          w: 150,
+          h: 1,
+          lineWidth: 1,
+          alignment: "right",
+        },
+      ],
+    },
+    {
+      text: signaturesName,
+      fontSize: 10,
+      bold: true,
+      color: "black",
+      alignment: "right", // Aligns the text to the right
+      absolutePosition: { x: 660, y: 350 },
+    },
+  ];
+
+  // Adding the signature content to the existing content
+  docDefinition.content.push(...signatureContent);
 
   pdfMake.createPdf(docDefinition).download("report.pdf");
 }
