@@ -211,8 +211,7 @@ export default function generatePDF(excelData) {
       fontSize: 10,
       bold: true,
       color: "black",
-      alignment: "right", // Aligns the text to the right
-      absolutePosition: { x: 660, y: 350 },
+      absolutePosition: { x: 690, y: 100 },
     },
   ];
 
