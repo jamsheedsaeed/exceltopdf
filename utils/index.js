@@ -18,7 +18,6 @@ export default function generatePDF(excelData) {
   const columnIndexToChangeColor = 34; // Change this index as needed
   const rowIndexToChangeColor = 10; // Change this index as needed
   const columnIndexToChangeFontColor = 1; // Index of the first column
-  const columnIndexToChangeFontColorLastTable = 1;
 
   const tableBody = lastTableData?.map((data) => [
     { text: data["#VALUE!"], style: "tableCell" },
@@ -33,65 +32,93 @@ export default function generatePDF(excelData) {
 
   var docDefinition = {
     pageOrientation: "landscape",
+    pageSize: { width: 900, height: 580.68 }, // Set custom page size (14.67 × 11.33 in)
     content: [
-      {
-        text: firstTableHeader,
-        style: "tableHeader",
-        alignment: "center",
-        margin: [0, 10],
-      },
       {
         table: {
           headerRows: 1,
-          widths: ["auto", "*"],
-          body: data1.map((row) => [
-            { text: row[0], style: "tableCell" },
-            { text: row[1], style: "tableCell" },
-          ]),
+          widths: [100, "*"],
+          body: [
+            [
+              {
+                text: "",
+                style: "tableHeaderFirst",
+                border: [true, true, false, true],
+              },
+              {
+                text: firstTableHeader,
+                style: "tableHeaderFirst",
+                border: [false, true, true, true],
+              },
+            ],
+
+            ...data1.map((row) => [
+              { text: row[0], style: "tableCell" },
+              { text: row[1], style: "tableCell" },
+            ]),
+          ],
         },
       },
       { text: "\n", fontSize: 10 },
       {
         table: {
-            headerRows: 1,
-            widths: [
-                20,
-                130, // Increased width for the second column
-                ...Array.from({ length: allHeaders.length - 2 }, () => "auto"),
-              ],            heights: 8,
-            layout: {
-                hLineWidth: (i) => (i === 0 ? 2 : 1),
-                vLineWidth: () => 1,
-                hLineColor: (i) => (i === 0 ? "#000" : "#aaa"),
-                paddingTop: (i) => (i === 0 ? 2 : 1),
-                paddingBottom: (i) => (i === table.body.length - 1 ? 2 : 1),
-                cellPadding: { top: 2, bottom: 2, left: 2, right: 2 }, // Adjust padding
-                fontSize: 8, // Adjust font size
-                lineHeight: 1, // Adjust line height
-            },
-            body: [
-              [
-                ...allHeaders.map((header) => ({
-                  text: data2[0][header],
-                  style: "tableCellBold",
-                })),
-              ],
-              ...data2.slice(1).map((row, rowIdx) => allHeaders.map((header, colIdx) => ({
-                text: row[header],
-                style: colIdx === columnIndexToChangeFontColor ? "redText" : "tableCell", // Apply specific style for the first column
-                fillColor: (rowIdx === rowIndexToChangeColor || colIdx === columnIndexToChangeColor) ? "#d0cece" : undefined, // Set the background color for the specific row and column
-              }))),
-            ],
+          headerRows: 1,
+          widths: [
+            20,
+            130, // Increased width for the second column
+            ...Array.from({ length: allHeaders.length - 2 }, () => "auto"),
+          ],
+          heights: 8,
+          layout: {
+            hLineWidth: (i) => (i === 0 ? 2 : 1),
+            vLineWidth: () => 1,
+            hLineColor: (i) => (i === 0 ? "#000" : "#aaa"),
+            paddingTop: (i) => (i === 0 ? 2 : 1),
+            paddingBottom: (i) => (i === table.body.length - 1 ? 2 : 1),
+            cellPadding: { top: 2, bottom: 2, left: 2, right: 2 }, // Adjust padding
+            fontSize: 8, // Adjust font size
+            lineHeight: 1, // Adjust line height
           },
+          body: [
+            [
+              ...allHeaders.map((header) => ({
+                text: data2[0][header],
+                style: "tableCellBold",
+              })),
+            ],
+            ...data2.slice(1).map((row, rowIdx) =>
+              allHeaders.map((header, colIdx) => ({
+                text: row[header],
+                style:
+                  colIdx === columnIndexToChangeFontColor
+                    ? "redText"
+                    : "tableCell", // Apply specific style for the first column
+                fillColor:
+                  rowIdx === rowIndexToChangeColor ||
+                  colIdx === columnIndexToChangeColor
+                    ? "#d0cece"
+                    : undefined, // Set the background color for the specific row and column
+              }))
+            ),
+          ],
         },
+      },
       {
         table: {
           headerRows: 1,
           widths: [200, "*"],
           body: [
             [
-              { text: thirdtblFirstColVal, style: "tableCellmiddle" },
-              { text: thirdtblSecColVal, style: "tableCellmiddle" },
+              {
+                border: [true, false, true, true],
+                text: thirdtblFirstColVal,
+                style: "tableCellmiddle",
+              },
+              {
+                border: [true, false, true, true],
+                text: thirdtblSecColVal,
+                style: "tableCellmiddle",
+              },
             ],
           ],
         },
@@ -100,7 +127,7 @@ export default function generatePDF(excelData) {
         table: {
           headerRows: 1,
           widths: ["auto", 130, 80, 500],
-          heights: 10,
+          heights: 40,
           body: [
             [
               { text: lastTableDataHeader["#VALUE!"], style: "tableCellBold" },
@@ -136,6 +163,13 @@ export default function generatePDF(excelData) {
         fontSize: 12,
         bold: true,
         color: "black", // Text color
+      },
+      tableHeaderFirst: {
+        bold: true,
+        fontSize: 12,
+        fillColor: "#b4c6e7", // Set the header color
+        color: "black", // Header text color
+        alignment: "center", // Header text alignment
       },
       tableCellBold: {
         fillColor: "#b4c6e7", // Set the header color
