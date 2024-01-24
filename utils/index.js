@@ -52,9 +52,9 @@ export default function generatePDF(excelData) {
               },
             ],
 
-            ...data1.map((row) => [
-              { text: row[0], style: "tableCell" },
-              { text: row[1], style: "tableCell" },
+            ...data1.map((row, index) => [
+              { text: row[0], style: "tableCellB" },
+              { text: row[1], style: index !== data1.length - 1 ? 'tableCellRed' : 'tableCell' },
             ]),
           ],
         },
@@ -106,7 +106,7 @@ export default function generatePDF(excelData) {
       {
         table: {
           headerRows: 1,
-          widths: [200, "*"],
+          widths: [246, 552],
           body: [
             [
               {
@@ -153,6 +153,15 @@ export default function generatePDF(excelData) {
       tableCell: {
         fontSize: 8,
         margin: [0, 3, 0, 3],
+      },
+      tableCellB: {
+        bold: true,
+        fontSize: 8,
+        margin: [0, 3, 0, 3],
+      },
+      tableCellRed: {
+        fontSize: 8,
+        color: 'red', // Red font color for cells
       },
       tableCellmiddle: {
         fontSize: 8,
