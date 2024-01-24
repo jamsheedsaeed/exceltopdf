@@ -6,6 +6,7 @@ import generatePDF from "../../../utils";
 const ExcelToPDFConverter = () => {
   const [excelFile, setExcelFile] = useState(null);
   const [selectedFileName, setSelectedFileName] = useState("");
+  const allowedFileTypes = ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]; // Excel file type
 
   const readExcelFile = (file) => {
     return new Promise((resolve, reject) => {
@@ -28,15 +29,26 @@ const ExcelToPDFConverter = () => {
   };
 
   const handleFileChange = (e) => {
-    const fileName = e.target.files[0]?.name || "";
-    setSelectedFileName(fileName);
-    setExcelFile(e.target.files[0]);
+    const file = e.target.files[0];
+
+    if (file && allowedFileTypes.includes(file.type)) {
+      const fileName = file.name || "";
+      setSelectedFileName(fileName);
+      setExcelFile(file);
+    } else {
+      // Display an error message or take appropriate action for invalid file type
+      console.error("Invalid file type. Please choose a valid Excel file.");
+    }
   };
 
   const handleConvertClick = async () => {
     try {
-      const excelData = await readExcelFile(excelFile);
-      generatePDF(excelData);
+      if (excelFile) {
+        const excelData = await readExcelFile(excelFile);
+        generatePDF(excelData);
+      } else {
+        console.error("No Excel file selected.");
+      }
     } catch (error) {
       console.error("Error converting Excel to PDF:", error);
     }
@@ -55,6 +67,7 @@ const ExcelToPDFConverter = () => {
         id="fileInput"
         className="hidden"
         onChange={handleFileChange}
+        accept=".xlsx, .xls" // Limit file selection to Excel files
       />
       <span className="ml-4 text-gray-700" id="fileName">
         {selectedFileName && `Selected File: ${selectedFileName}`}
@@ -65,10 +78,8 @@ const ExcelToPDFConverter = () => {
       >
         Convert to PDF
       </button>
-
     </div>
   );
-  
 };
 
 export default ExcelToPDFConverter;
