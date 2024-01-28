@@ -1,0 +1,108 @@
+{
+  "firstTable": {
+    "date": "10/12/2024",
+    "projectName": "Bikues",
+    "projectUser": "Antonio. K",
+    "contractNumber": "test123",
+    "employee": "John"
+  },
+  "secondTable": [
+    {
+      "name": "Antonio. K",
+      "oib": "Prisma test check",
+      "days": [1, 3, 5, 28,17]
+    },
+    {
+      "name": "Antonio. K",
+      "oib": "Prisma test check",
+      "days": [1, 3, 5, 28]
+    },
+    {
+      "name": "Antonio. K",
+      "oib": "Prisma test check",
+      "days": [1, 3, 5, 28]
+    },
+    {
+      "name": "Uip",
+      "oib": "Prisma test check",
+      "days": [1, 3, 9, 25,23]
+    },
+    {
+      "name": "Antonio. K",
+      "oib": "Prisma test check",
+      "days": [1, 3, 5, 28]
+    },
+    {
+      "name": "Antonio. K",
+      "oib": "Prisma test check",
+      "days": [1, 3, 5, 28]
+    },
+    {
+      "name": "Antonio. K",
+      "oib": "Prisma test check",
+      "days": [1, 3, 5, 28]
+    },
+    {
+      "name": "Uip",
+      "oib": "Prisma test check",
+      "days": [1, 3, 9, 25,23]
+    },
+    {
+      "name": "Antonio. K",
+      "oib": "Prisma test check",
+      "days": [1, 3, 5, 28]
+    },
+    {
+      "name": "Uip",
+      "oib": "Prisma test check",
+      "days": [1, 3, 9, 25,23]
+    }
+  ],
+  "thirdTable":{
+    "name": "Napomena",
+    "value": "Brojevi navedeni u retku 12 predstavljaju datume u jednom kalendarskom mjesecu. Prilikom ispunjavanja mjesečnog sažetka za praćenje (dnevnika obilaska) u prazne ćelije na dane kada je pojedinom krajnjem korisniku pružena usluga od strane pojedinog pružatelja usluge potrebno je upisati X dok na dane kada usluga od strane pojedinog pružatelja usluge nije pružena potrebno je ostaviti praznu ćeliju odnosno ne upisivati nikakve vrijednosti." 
+  },
+  "fourthTable": [
+    {
+      "name": "Antonio. K",
+      "oib": "Prisma test check",
+      "workDone": "worked done"
+    },
+    {
+      "name": "Antonio. K",
+      "oib": "Prisma test check",
+      "workDone": "worked done"
+    }
+    ,
+    {
+      "name": "Antonio. K",
+      "oib": "Prisma test check",
+      "workDone": "worked done"
+    }
+    ,
+    {
+      "name": "Antonio. K",
+      "oib": "Prisma test check",
+      "workDone": "worked done"
+    },
+    {
+      "name": "Antonio. K",
+      "oib": "Prisma test check",
+      "workDone": "worked done"
+    },
+    {
+      "name": "Antonio. K",
+      "oib": "Prisma test check",
+      "workDone": "worked done"
+    }
+    ,
+    {
+      "name": "Antonio. K",
+      "oib": "Prisma test check",
+      "workDone": "worked done"
+    }
+  ],
+  "signature": {
+    "name": ""
+  }
+}

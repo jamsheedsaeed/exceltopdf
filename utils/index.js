@@ -2,43 +2,176 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-export default function generatePDF(excelData) {
+export default function generatePDF(jsData) {
   try {
-    if (!Array.isArray(excelData) || excelData.length === 0) {
-      throw new Error("Invalid excelData. It should be a non-empty array.");
+    // Create the Header for first Table
+    const firstTableHeader = "MJESEČNI SAŽETAK ZA PRAĆENJE (DNEVNIK OBILASKA)";
+    // Create Headers for the second Table
+    const headerdata = {
+      __EMPTY: null,
+      "#VALUE!": "Redni broj",
+      __EMPTY_1: "Ime i prezime krajnjeg korisnika",
+      __EMPTY_2: "OIB krajnjeg korisnika",
+    };
+    // Add numbers from 3 to 34
+    for (let i = 3; i <= 34; i++) {
+      headerdata[`__EMPTY_${i}`] = i - 2;
     }
+    // Add "Ukupno" at the end
+    headerdata["__EMPTY_34"] = "Ukupno";
+    //---------------------------------------------------------------
+    const thirdTableValues = jsData.thirdTable;
+    const thirdtblFirstColVal = thirdTableValues.name;
+    const thirdtblSecColVal = thirdTableValues.value;
 
-    const data1 = excelData
-      .slice(1, 7)
-      .map((row) => [row["#VALUE!"], row["__EMPTY_2"]]);
-
-    const firstTableHeader = excelData[0]["#VALUE!"];
-    const thirdTableValues = excelData[19];
-    const thirdtblFirstColVal = thirdTableValues["#VALUE!"];
-    const thirdtblSecColVal = thirdTableValues["__EMPTY_3"];
-    const data2 = excelData.slice(7, 19);
-    const lastTableData = excelData.slice(21, 31);
-    const lastTableDataHeader = excelData[20];
-    const signaturesName = excelData[31]["__EMPTY_26"];
+    const lastTableData = jsData.fourthTable;
+    const lastTableDataHeader = {
+      countColumn: "Redni broj",
+      nameColumn: "Ime i prezime krajnjeg korisnika",
+      oibColumn: "OIB krajnjeg korisnika",
+      workdoneColumn:
+        "Navesti opis usluga izvršenih od strane pružatelja usluge za svakog krajnjeg korisnika",
+    };
+    const signaturesName = jsData.signature.name;
     const columnIndexToChangeColor = 34; // Change this index as needed
     const rowIndexToChangeColor = 10; // Change this index as needed
     const columnIndexToChangeFontColor = 1; // Index of the first column
 
     // Ensure tableBody is not undefined before using it
     const tableBody =
-      lastTableData?.map((data) => [
-        { text: data["#VALUE!"], style: "tableCell" },
-        { text: data["__EMPTY_1"], style: "redText" },
-        { text: data["__EMPTY_2"], style: "tableCell" },
-        { text: data["__EMPTY_3"], style: "tableCell" },
-      ]) || [];
+      lastTableData?.map((data, index) => {
+        // Set a default height for all rows except the first one
+        const rowHeight = index === 0 ? null : 60; // Adjust the height as per your requirement
 
-    const allHeaders = Object.keys(data2[0] || {}).filter(
+        return [
+          {
+            text: index + 1,
+            style: "tableCell",
+            rowSpan: 1,
+            height: rowHeight,
+            alignment: "center",
+          }, // Increase the height for all rows except the first one
+          { text: data.name, style: "redText", rowSpan: 1, height: rowHeight, alignment: "center" },
+          { text: data.oib, style: "tableCell", rowSpan: 1, height: rowHeight },
+          {
+            text: data.workDone,
+            style: "tableCell",
+            rowSpan: 1,
+            height: rowHeight,
+          },
+        ];
+      }) || [];
+
+    let transformedArray = [];
+
+    // Loop through each object in the original array
+    jsData.secondTable.forEach((item, index) => {
+      // Transform each object
+      let transformedObject = {
+        __EMPTY: null,
+        "#VALUE!": index + 1,
+        __EMPTY_1: item.name,
+        __EMPTY_2: item.oib,
+      };
+
+      // Map days to respective slots
+      for (let i = 1; i <= 31; i++) {
+        transformedObject[`__EMPTY_${i + 2}`] = item.days.includes(i)
+          ? "x"
+          : null;
+      }
+      transformedObject[`__EMPTY_34`] = item.days.length;
+
+      // Add the transformed object to the result array
+      transformedArray.push(transformedObject);
+    });
+    // Add the additional row to the result array
+    //transformedArray.push(additionalRow);
+    let columnCounts = Array(35).fill(0); // Assuming there are 35 columns including "__EMPTY" and "#VALUE!"
+    let totalValuesRowCount = 0;
+    // Iterate over each transformed object in the transformedArray
+    transformedArray.forEach((transformedObject, index) => {
+      if (index < transformedArray.length) {
+        totalValuesRowCount =
+          totalValuesRowCount + transformedObject[`__EMPTY_34`];
+      }
+      // Iterate over each column and count non-null values
+      for (let i = 3; i <= 34; i++) {
+        // Starting from column "__EMPTY_3" to "__EMPTY_34"
+        if (transformedObject[`__EMPTY_${i}`] !== null) {
+          columnCounts[i]++;
+        }
+      }
+    });
+
+    // Create the additional row for showing the count of values in each column
+    let totalCountRow = {
+      __EMPTY: null,
+      "#VALUE!": {
+        text: "",
+        alignment: "center",
+        border: [false, false, false, false],
+      }, // Colspan 3 and centered
+      __EMPTY_1: {
+        text: "UKupno",
+        alignment: "center",
+        border: [true, true, false, true],
+      }, // Colspan 3 and centered
+      __EMPTY_2: {
+        text: "",
+        alignment: "center",
+        border: [false, true, true, true],
+      }, // Colspan 3 and centered
+    };
+
+    // Iterate over each column count and assign it to the corresponding column in the total count row
+    for (let i = 3; i <= 34; i++) {
+      // Starting from column "__EMPTY_3" to "__EMPTY_34"
+      if (i == 34) {
+        totalCountRow[`__EMPTY_34`] = totalValuesRowCount;
+      } else {
+        totalCountRow[`__EMPTY_${i}`] = columnCounts[i];
+      }
+    }
+
+    // Add the total count row to the result array
+    transformedArray.push(totalCountRow);
+
+    const allHeaders = Object.keys(headerdata || {}).filter(
       (header) => header !== "__EMPTY"
     );
+    const mappedData = Object.entries(jsData.firstTable).map(([key, value]) => [
+      key,
+      value,
+    ]);
+
     var docDefinition = {
       pageOrientation: "landscape",
-      pageSize: { width: 900, height: 580.68 }, // Set custom page size (14.67 × 11.33 in)
+      pageSize: { width: 940, height: 580.68 }, // Set custom page size (14.67 × 11.33 in)
+      // Add event handler to remove header on page breaks
+      pageBreakBefore: function (
+        currentNode,
+        followingNodesOnPage,
+        nodesOnNextPage,
+        previousNodesOnPage
+      ) {
+        // Check if there are following nodes on the next page
+        if (nodesOnNextPage.length > 0) {
+          // Iterate through the following nodes on the next page
+          for (const node of nodesOnNextPage) {
+            // Check if the node has a style property
+            if (node.hasOwnProperty("style")) {
+              // Check if the node style has a property indicating a header
+              if (node.style.includes("header")) {
+                // Remove the header by returning true to indicate a page break before the node
+                return true;
+              }
+            }
+          }
+        }
+        // Return false to maintain normal page flow
+        return false;
+      },
       content: [
         {
           table: {
@@ -57,13 +190,14 @@ export default function generatePDF(excelData) {
                   border: [false, true, true, true],
                 },
               ],
-
-              ...data1.map((row, index) => [
+              ...mappedData.map((row, index) => [
                 { text: row[0], style: "tableCellB" },
                 {
                   text: row[1],
                   style:
-                    index !== data1.length - 1 ? "tableCellRed" : "tableCell",
+                    index !== mappedData.length - 1
+                      ? "tableCellRed"
+                      : "tableCell",
                 },
               ]),
             ],
@@ -74,9 +208,10 @@ export default function generatePDF(excelData) {
           table: {
             headerRows: 1,
             widths: [
-              20,
-              130, // Increased width for the second column
-              ...Array.from({ length: allHeaders.length - 2 }, () => "auto"),
+              40,
+              127, // Increased width for the second column
+              100,
+              ...Array.from({ length: allHeaders.length - 3 }, () => "auto"),
             ],
             heights: 8,
             layout: {
@@ -92,40 +227,67 @@ export default function generatePDF(excelData) {
             body: [
               [
                 ...allHeaders.map((header) => ({
-                  text: data2[0][header],
+                  text: headerdata[header],
                   style: "tableCellBold",
                 })),
               ],
-              ...data2.slice(1).map((row, rowIdx) =>
-                allHeaders.map((header, colIdx) => ({
-                  text: row[header],
-                  style:
-                    colIdx === columnIndexToChangeFontColor
-                      ? "redText"
-                      : "tableCell", // Apply specific style for the first column
-                  fillColor:
-                    rowIdx === rowIndexToChangeColor ||
-                    colIdx === columnIndexToChangeColor
-                      ? "#d0cece"
-                      : undefined, // Set the background color for the specific row and column
-                }))
-              ),
+              ...transformedArray.map((row, rowIdx) => {
+                // Check if it's the last row
+                const isLastRow = rowIdx === transformedArray.length - 1;
+
+                return allHeaders.map((header, colIdx) => {
+                  // Check if it's the first cell
+                  const isFirstCell = colIdx === 0;
+
+                  // Check if it's the first three cells of the last row
+                  const isFirstThreeCells = isLastRow && colIdx < 3;
+
+                  return {
+                    text: row[header],
+                    style:
+                      colIdx === columnIndexToChangeFontColor
+                        ? "redText"
+                        : "tableCell", // Apply specific style for the first column
+                    fillColor:
+                      rowIdx === rowIndexToChangeColor ||
+                      colIdx === columnIndexToChangeColor
+                        ? "#d0cece"
+                        : undefined, // Set the background color for the specific row and column
+                    alignment: "center", // Align content centered within the column
+                    border: (() => {
+                      if (isFirstCell) {
+                        // For the first cell, set left and bottom border
+                        return [true, false, false, true];
+                      } else if (isFirstThreeCells) {
+                        // For the first three cells of the last row, remove all borders except the bottom
+                        return [false, false, false, true];
+                      } else {
+                        // For other cells, leave the border undefined
+                        return undefined;
+                      }
+                    })(),
+                  };
+                });
+              }),
             ],
           },
         },
+        { text: "\n", fontSize: 10 },
+
         {
           table: {
             headerRows: 1,
-            widths: [246, 552],
+            widths: [283, "*"],
+            heights: 50,
             body: [
               [
                 {
-                  border: [true, false, true, true],
+                  border: [true, true, true, true],
                   text: thirdtblFirstColVal,
                   style: "tableCellmiddle",
                 },
                 {
-                  border: [true, false, true, true],
+                  border: [true, true, true, true],
                   text: thirdtblSecColVal,
                   style: "tableCellmiddle",
                 },
@@ -133,27 +295,35 @@ export default function generatePDF(excelData) {
             ],
           },
         },
+        { text: "\n", fontSize: 10 },
+        { text: "", pageBreak: "before" }, // Add a page break before the table
         {
           table: {
             headerRows: 1,
-            widths: ["auto", 130, 80, 500],
-            heights: 40,
+            heights: function (row) {
+              if (row === 0) {
+                return null;
+              } else {
+                return 60;
+              }
+            },
+            widths: ["auto", 130, 80, "*"],
             body: [
               [
                 {
-                  text: lastTableDataHeader["#VALUE!"],
+                  text: lastTableDataHeader.countColumn,
                   style: "tableCellBold",
                 },
                 {
-                  text: lastTableDataHeader["__EMPTY_1"],
+                  text: lastTableDataHeader.nameColumn,
                   style: "tableCellBold",
                 },
                 {
-                  text: lastTableDataHeader["__EMPTY_2"],
+                  text: lastTableDataHeader.oibColumn,
                   style: "tableCellBold",
                 },
                 {
-                  text: lastTableDataHeader["__EMPTY_3"],
+                  text: lastTableDataHeader.workdoneColumn,
                   style: "tableCellBold",
                 },
               ],
@@ -218,13 +388,12 @@ export default function generatePDF(excelData) {
       {
         canvas: [
           {
-            type: "rect",
-            x: 620,
-            y: 50,
-            w: 150,
-            h: 1,
+            type: "line",
+            x1: 670,
+            y1: 40,
+            x2: 820, // Adjusted the end point of the line
+            y2: 40,
             lineWidth: 1,
-            alignment: "right",
           },
         ],
       },
@@ -233,17 +402,18 @@ export default function generatePDF(excelData) {
         fontSize: 10,
         bold: true,
         color: "black",
-        absolutePosition: { x: 690, y: 100 },
+        alignment: "right",
+        margin: [0, 5, 0, 5], // Add top margin to position it below the line
       },
     ];
 
-    // Adding the signature content to the existing content
     docDefinition.content.push(...signatureContent);
 
     pdfMake.createPdf(docDefinition).download("report.pdf");
   } catch (error) {
     console.error("Error generating PDF:", error.message);
-    alert("Oops! Something went wrong while generating the PDF. Please try again.");
-    // You can add additional error handling logic here, such as displaying a user-friendly message.
+    alert(
+      "Oops! Something went wrong while generating the PDF. Please try again."
+    );
   }
 }
