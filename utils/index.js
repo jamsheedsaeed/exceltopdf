@@ -1,5 +1,6 @@
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
+import html2canvas from "html2canvas";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export default function generatePDF(jsData) {
@@ -42,20 +43,30 @@ export default function generatePDF(jsData) {
       lastTableData?.map((data, index) => {
         // Set a default height for all rows except the first one
         const rowHeight = index === 0 ? null : 60; // Adjust the height as per your requirement
-
         return [
           {
             text: index + 1,
-            style: "tableCell",
+            style: "tableCellLastTable",
             rowSpan: 1,
             height: rowHeight,
             alignment: "center",
           }, // Increase the height for all rows except the first one
-          { text: data.name, style: "redText", rowSpan: 1, height: rowHeight, alignment: "center" },
-          { text: data.oib, style: "tableCell", rowSpan: 1, height: rowHeight },
+          {
+            text: data.name,
+            style: "redTextLastTable",
+            rowSpan: 1,
+            height: rowHeight,
+            alignment: "center",
+          },
+          {
+            text: data.oib,
+            style: "tableCellLastTable",
+            rowSpan: 1,
+            height: rowHeight,
+          },
           {
             text: data.workDone,
-            style: "tableCell",
+            style: "tableCellLastTable",
             rowSpan: 1,
             height: rowHeight,
           },
@@ -145,35 +156,122 @@ export default function generatePDF(jsData) {
       value,
     ]);
 
+    pdfMake.tableLayouts = {
+      exampleLayout: {
+        hLineWidth: function (i, node) {
+          // Set thicker horizontal lines for the first row, last row, and header row
+          return i === 0 ||
+            i === node.table.body.length ||
+            i === node.table.headerRows
+            ? 0.5
+            : 0.3;
+        },
+        vLineWidth: function (i) {
+          // Set thicker vertical lines
+          return 0.5;
+        },
+        hLineColor: function (i) {
+          // Set black color for horizontal lines
+          return "black";
+        },
+        paddingLeft: function (i) {
+          // Set padding for left side of cells
+          return i === 0 ? 2 : 2;
+        },
+        paddingRight: function (i, node) {
+          // Set padding for right side of cells
+          return i === node.table.widths.length - 1 ? 0 : 8;
+        },
+      },
+      secondTableLayout: {
+        hLineWidth: function (i, node) {
+          // Set thicker horizontal lines for the first row, last row, and header row
+          return i === 0 ||
+            i === node.table.body.length ||
+            i === node.table.headerRows
+            ? 0.5
+            : 0.3;
+        },
+        vLineWidth: function (i) {
+          // Set thicker vertical lines
+          return 0.5;
+        },
+        hLineColor: function (i) {
+          // Set black color for horizontal lines
+          return "black";
+        },
+        paddingLeft: function (i) {
+          // Set padding for left side of cells
+          return i === 0 ? 2 : 2;
+        },
+        paddingRight: function (i, node) {
+          // Set padding for right side of cells
+          return i === node.table.widths.length - 1 ? 0 : 8;
+        },
+      },
+      fourthTableLayout: {
+        hLineWidth: function (i, node) {
+          // Set thicker horizontal lines for the first row, last row, and header row
+          return i === 0 ||
+            i === node.table.body.length ||
+            i === node.table.headerRows
+            ? 0.5
+            : 0.3;
+        },
+        vLineWidth: function (i) {
+          // Set thicker vertical lines
+          return 0.5;
+        },
+        hLineColor: function (i) {
+          // Set black color for horizontal lines
+          return "black";
+        },
+        paddingLeft: function (i) {
+          // Set padding for left side of cells
+          return i === 0 ? 2 : 2;
+        },
+        paddingRight: function (i, node) {
+          // Set padding for right side of cells
+          return i === node.table.widths.length - 1 ? 0 : 8;
+        },
+      },
+      thirdTableLayout: {
+        hLineWidth: function (i, node) {
+          // Set thicker horizontal lines for the first row, last row, and header row
+          return i === 0 ||
+            i === node.table.body.length ||
+            i === node.table.headerRows
+            ? 0.5
+            : 0.3;
+        },
+        vLineWidth: function (i) {
+          // Set thicker vertical lines
+          return 0.5;
+        },
+        hLineColor: function (i) {
+          // Set black color for horizontal lines
+          return "black";
+        },
+        paddingLeft: function (i) {
+          // Set padding for left side of cells
+          return i === 0 ? 2 : 2;
+        },
+        paddingRight: function (i, node) {
+          // Set padding for right side of cells
+          return i === node.table.widths.length - 1 ? 0 : 8;
+        },
+      },
+    };
+
     var docDefinition = {
       pageOrientation: "landscape",
       pageSize: { width: 940, height: 580.68 }, // Set custom page size (14.67 × 11.33 in)
+      pageMargins: [70, 90, 70, 50],
       // Add event handler to remove header on page breaks
-      pageBreakBefore: function (
-        currentNode,
-        followingNodesOnPage,
-        nodesOnNextPage,
-        previousNodesOnPage
-      ) {
-        // Check if there are following nodes on the next page
-        if (nodesOnNextPage.length > 0) {
-          // Iterate through the following nodes on the next page
-          for (const node of nodesOnNextPage) {
-            // Check if the node has a style property
-            if (node.hasOwnProperty("style")) {
-              // Check if the node style has a property indicating a header
-              if (node.style.includes("header")) {
-                // Remove the header by returning true to indicate a page break before the node
-                return true;
-              }
-            }
-          }
-        }
-        // Return false to maintain normal page flow
-        return false;
-      },
+
       content: [
         {
+          layout: "exampleLayout",
           table: {
             headerRows: 1,
             widths: [100, "*"],
@@ -205,30 +303,29 @@ export default function generatePDF(jsData) {
         },
         { text: "\n", fontSize: 10 },
         {
+          layout: "secondTableLayout",
           table: {
             headerRows: 1,
             widths: [
               40,
-              127, // Increased width for the second column
-              100,
-              ...Array.from({ length: allHeaders.length - 3 }, () => "auto"),
+              "*", // Increased width for the second column
+              83,
+              "auto",
+              "auto",
+              "auto",
+              "auto",
+              "auto",
+              "auto",
+              "auto",
+              ...Array.from({ length: allHeaders.length - 10 }, () => "auto"),
             ],
             heights: 8,
-            layout: {
-              hLineWidth: (i) => (i === 0 ? 2 : 1),
-              vLineWidth: () => 1,
-              hLineColor: (i) => (i === 0 ? "#000" : "#aaa"),
-              paddingTop: (i) => (i === 0 ? 2 : 1),
-              paddingBottom: (i) => (i === table.body.length - 1 ? 2 : 1),
-              cellPadding: { top: 2, bottom: 2, left: 2, right: 2 }, // Adjust padding
-              fontSize: 8, // Adjust font size
-              lineHeight: 1, // Adjust line height
-            },
             body: [
               [
                 ...allHeaders.map((header) => ({
                   text: headerdata[header],
                   style: "tableCellBold",
+                  alignment: "center",
                 })),
               ],
               ...transformedArray.map((row, rowIdx) => {
@@ -273,18 +370,20 @@ export default function generatePDF(jsData) {
           },
         },
         { text: "\n", fontSize: 10 },
+        { text: "", pageBreak: "before" }, // Add a page break before the table
 
         {
+          layout: "thirdTableLayout",
           table: {
             headerRows: 1,
             widths: [283, "*"],
-            heights: 50,
+            heights: 30,
             body: [
               [
                 {
                   border: [true, true, true, true],
                   text: thirdtblFirstColVal,
-                  style: "tableCellmiddle",
+                  style: "tableCellmiddlebold",
                 },
                 {
                   border: [true, true, true, true],
@@ -296,10 +395,9 @@ export default function generatePDF(jsData) {
           },
         },
         { text: "\n", fontSize: 10 },
-        { text: "", pageBreak: "before" }, // Add a page break before the table
         {
+          layout: "fourthTableLayout",
           table: {
-            headerRows: 1,
             heights: function (row) {
               if (row === 0) {
                 return null;
@@ -307,24 +405,26 @@ export default function generatePDF(jsData) {
                 return 60;
               }
             },
-            widths: ["auto", 130, 80, "*"],
+            pageBreak: "avoid", // Add this line to prevent page breaks within the table
+            dontBreakRows: true, // Add this line to prevent rows from breaking across pages
+            widths: ["auto", "auto", 80, "*"],
             body: [
               [
                 {
                   text: lastTableDataHeader.countColumn,
-                  style: "tableCellBold",
+                  style: "tableCellBoldBody",
                 },
                 {
                   text: lastTableDataHeader.nameColumn,
-                  style: "tableCellBold",
+                  style: "tableCellBoldBody",
                 },
                 {
                   text: lastTableDataHeader.oibColumn,
-                  style: "tableCellBold",
+                  style: "tableCellBoldBody",
                 },
                 {
                   text: lastTableDataHeader.workdoneColumn,
-                  style: "tableCellBold",
+                  style: "tableCellBoldBody",
                 },
               ],
               ...tableBody,
@@ -333,22 +433,35 @@ export default function generatePDF(jsData) {
         },
       ],
       styles: {
+        tableExample: {
+          margin: [30, 15, 0, 15],
+        },
         tableCell: {
-          fontSize: 8,
+          fontSize: 6,
           margin: [0, 3, 0, 3],
+        },
+        tableCellLastTable: {
+          fontSize: 6,
+          margin: [0, 30, 0, 0],
         },
         tableCellB: {
           bold: true,
-          fontSize: 8,
+          fontSize: 6,
           margin: [0, 3, 0, 3],
         },
         tableCellRed: {
-          fontSize: 8,
+          bold: true,
+          fontSize: 6,
           color: "red", // Red font color for cells
         },
+        tableCellmiddlebold: {
+          bold: true,
+          fontSize: 6,
+          fillColor: "#fce4d6", // Set the cell color
+          margin: [0, 10, 0, 0], // Adjust top and bottom margins for vertical centering
+        },
         tableCellmiddle: {
-          fontSize: 8,
-          margin: [0, 3, 0, 3],
+          fontSize: 6,
           fillColor: "#fce4d6", // Set the cell color
         },
         tableHeader: {
@@ -358,16 +471,21 @@ export default function generatePDF(jsData) {
         },
         tableHeaderFirst: {
           bold: true,
-          fontSize: 12,
-          fillColor: "#b4c6e7", // Set the header color
+          fontSize: 10,
+          fillColor: "#b4c6e7", // Set the header color,.
           color: "black", // Header text color
           alignment: "center", // Header text alignment
         },
         tableCellBold: {
           fillColor: "#b4c6e7", // Set the header color
-          fontSize: 8,
-          margin: [0, 3, 0, 3],
+          fontSize: 6,
           bold: true,
+        },
+        tableCellBoldBody: {
+          fillColor: "#b4c6e7", // Set the header color
+          fontSize: 6,
+          bold: true,
+          alignment: "center",
         },
         tableCellBoldlast: {
           fillColor: "#b4c6e7", // Set the header color
@@ -377,9 +495,15 @@ export default function generatePDF(jsData) {
         },
         redText: {
           color: "red", // Set the text color for the first column data
-          fontSize: 8,
+          fontSize: 6,
           bold: true,
           margin: [0, 3, 0, 3],
+        },
+        redTextLastTable: {
+          color: "red", // Set the text color for the first column data
+          fontSize: 6,
+          bold: true,
+          margin: [0, 30, 0, 0],
         },
       },
     };
@@ -389,27 +513,27 @@ export default function generatePDF(jsData) {
         canvas: [
           {
             type: "line",
-            x1: 670,
-            y1: 40,
-            x2: 820, // Adjusted the end point of the line
-            y2: 40,
-            lineWidth: 1,
+            x1: 650,
+            y1: 70,
+            x2: 770, // Adjusted the end point of the line
+            y2: 70,
+            lineWidth: 0.3,
           },
         ],
       },
       {
         text: signaturesName,
-        fontSize: 10,
-        bold: true,
+        fontSize: 8,
         color: "black",
         alignment: "right",
-        margin: [0, 5, 0, 5], // Add top margin to position it below the line
+        margin: [0, 5, 48, 50], // Add top margin to position it below the line
       },
     ];
 
     docDefinition.content.push(...signatureContent);
 
-    pdfMake.createPdf(docDefinition).download("report.pdf");
+    // pdfMake.createPdf(docDefinition).download("report.pdf");
+    pdfMake.createPdf(docDefinition).open();
   } catch (error) {
     console.error("Error generating PDF:", error.message);
     alert(

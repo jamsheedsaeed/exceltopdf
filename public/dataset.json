@@ -4,56 +4,57 @@
     "projectName": "Bikues",
     "projectUser": "Antonio. K",
     "contractNumber": "test123",
-    "employee": "John"
+    "employee": "John",
+    "Mjerljivi ishod:": "Pružene mjesečne usluge potpore i podrške za najmanje 6 pripadnika ciljne skupine s pripadajućim paketom kućanskih i osnovnih higijenskih potrepština kroz projekt"
   },
   "secondTable": [
     {
-      "name": "Antonio. K",
+      "name": "Ime i prezime 1. krajnjeg korisnika",
       "oib": "Prisma test check",
       "days": [1, 3, 5, 28,17]
     },
     {
-      "name": "Antonio. K",
+      "name": "Ime i prezime 1. krajnjeg korisnika",
       "oib": "Prisma test check",
       "days": [1, 3, 5, 28]
     },
     {
-      "name": "Antonio. K",
+      "name": "Ime i prezime 1. krajnjeg korisnika",
       "oib": "Prisma test check",
       "days": [1, 3, 5, 28]
     },
     {
-      "name": "Uip",
+      "name": "Ime i prezime 1. krajnjeg korisnika",
       "oib": "Prisma test check",
       "days": [1, 3, 9, 25,23]
     },
     {
-      "name": "Antonio. K",
+      "name": "Ime i prezime 1. krajnjeg korisnika",
       "oib": "Prisma test check",
       "days": [1, 3, 5, 28]
     },
     {
-      "name": "Antonio. K",
+      "name": "Ime i prezime 1. krajnjeg korisnika",
       "oib": "Prisma test check",
       "days": [1, 3, 5, 28]
     },
     {
-      "name": "Antonio. K",
+      "name": "Ime i prezime 1. krajnjeg korisnika",
       "oib": "Prisma test check",
       "days": [1, 3, 5, 28]
     },
     {
-      "name": "Uip",
+      "name": "Ime i prezime 1. krajnjeg korisnika",
       "oib": "Prisma test check",
       "days": [1, 3, 9, 25,23]
     },
     {
-      "name": "Antonio. K",
+      "name": "Ime i prezime 1. krajnjeg korisnika",
       "oib": "Prisma test check",
       "days": [1, 3, 5, 28]
     },
     {
-      "name": "Uip",
+      "name": "Ime i prezime 1. krajnjeg korisnika",
       "oib": "Prisma test check",
       "days": [1, 3, 9, 25,23]
     }
@@ -64,45 +65,61 @@
   },
   "fourthTable": [
     {
-      "name": "Antonio. K",
+      "name": "Ime i prezime 1. krajnjeg korisnika",
       "oib": "Prisma test check",
       "workDone": "worked done"
     },
     {
-      "name": "Antonio. K",
+      "name": "Ime i prezime 2. krajnjeg korisnika",
       "oib": "Prisma test check",
       "workDone": "worked done"
     }
     ,
     {
-      "name": "Antonio. K",
+      "name": "Ime i prezime 3. krajnjeg korisnika",
       "oib": "Prisma test check",
       "workDone": "worked done"
     }
     ,
     {
-      "name": "Antonio. K",
+      "name": "Ime i prezime 4. krajnjeg korisnika",
       "oib": "Prisma test check",
       "workDone": "worked done"
     },
     {
-      "name": "Antonio. K",
+      "name": "Ime i prezime 5. krajnjeg korisnika",
       "oib": "Prisma test check",
       "workDone": "worked done"
     },
     {
-      "name": "Antonio. K",
+      "name": "Ime i prezime 6. krajnjeg korisnika",
       "oib": "Prisma test check",
       "workDone": "worked done"
     }
     ,
     {
-      "name": "Antonio. K",
+      "name": "Ime i prezime 7. krajnjeg korisnika",
+      "oib": "Prisma test check",
+      "workDone": "worked done"
+    },
+    {
+      "name": "Ime i prezime 8. krajnjeg korisnika",
+      "oib": "Prisma test check",
+      "workDone": "worked done"
+    },
+    {
+      "name": "Ime i prezime 9. krajnjeg korisnika",
+      "oib": "Prisma test check",
+      "workDone": "worked done"
+    }
+    ,
+    {
+      "name": "Ime i prezime 10. krajnjeg korisnika",
       "oib": "Prisma test check",
       "workDone": "worked done"
     }
   ],
   "signature": {
-    "name": ""
+    "name": "Potpis nositelja projekta"
   }
 }

@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "html2canvas": "^1.4.1",
     "next": "14.0.4",
     "pdfmake": "^0.2.9",
     "react": "^18",
